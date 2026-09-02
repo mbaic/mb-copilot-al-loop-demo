@@ -25,6 +25,6 @@ if ($Count -gt $Limit) {
     exit 0
 }
 
-$Context = "Attempt $Count of $LIMIT."
+$Context = "Attempt $Count of $Limit."
 Write-Output (@{hookSpecificOutput=@{permissionDecision="allow"; additionalContext=$Context}} | ConvertTo-Json -Compress)
 exit 0
