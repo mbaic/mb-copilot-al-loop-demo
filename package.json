@@ -23,7 +23,6 @@
   "categories": [
     "AI"
   ],
-  "icon": "icon.png",
   "contributes": {
     "chatAgents": [
       {
