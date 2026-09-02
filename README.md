@@ -59,8 +59,8 @@ This extension never commits code for you. It only edits files in your working f
 
 | File | Purpose |
 |------|---------|
-| `agents/al-build-loop.agent.md` | The custom agent. Defines its allowed tools and its loop instructions. |
-| `prompts/fix-build-loop.prompt.md` | The `/fix-build-loop` slash command. |
+| `.github/agents/al-build-loop.agent.md` | The custom agent. Defines its allowed tools and its loop instructions. |
+| `.github/prompts/fix-build-loop.prompt.md` | The `/fix-build-loop` slash command. |
 | `hooks/hooks.json` | Registers the attempt-limit script to run before every tool call. |
 | `hooks/loop-limit.sh` | The attempt-limit script, for macOS and Linux. |
 | `hooks/loop-limit.ps1` | The attempt-limit script, for Windows. |
