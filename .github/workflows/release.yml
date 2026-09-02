@@ -1,6 +1,12 @@
 name: Release
 
 on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.1.0)'
+        required: true
+        type: string
   push:
     tags:
       - 'v*'
@@ -13,6 +19,61 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Configure Git
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update version in package.json
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          sed -i 's/"version": "[^"]*"/"version": "${{ steps.version.outputs.version }}"/' package.json
+
+      - name: Update CHANGELOG.md
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cat > /tmp/new_changelog.md << 'EOF'
+          # Changelog
+
+          ## ${{ steps.version.outputs.version }} — Release
+
+          - Release of MB AL Loop Demo extension
+          - Custom agent for Business Central AL loop engineering
+          - `/fix-build-loop` slash command for fixing compile errors in AL projects
+          - Hard attempt limit of 3 enforced by workspace hooks
+          - Support for macOS, Linux (bash) and Windows (PowerShell)
+
+          EOF
+          tail -n +3 CHANGELOG.md >> /tmp/new_changelog.md
+          mv /tmp/new_changelog.md CHANGELOG.md
+
+      - name: Commit version bump
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git add package.json CHANGELOG.md
+          git commit -m "Bump version to ${{ steps.version.outputs.version }}" || echo "No changes to commit"
+          git push origin main
+
+      - name: Create and push tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.version }}" || true
+          git push origin "${{ steps.version.outputs.tag }}" || true
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -25,14 +86,11 @@ jobs:
       - name: Package extension
         run: vsce package
 
-      - name: Get version from tag
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: mb-al-loop-demo-${{ steps.version.outputs.version }}.vsix
+          tag_name: ${{ steps.version.outputs.tag }}
           draft: false
           prerelease: false
           body: |
