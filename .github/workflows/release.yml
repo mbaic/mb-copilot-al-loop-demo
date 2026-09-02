@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Package extension
+        run: vsce package
+
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: mb-al-loop-demo-${{ steps.version.outputs.version }}.vsix
+          draft: false
+          prerelease: false
+          body: |
+            ## MB AL Loop Demo v${{ steps.version.outputs.version }}
+
+            A minimal VS Code extension that demonstrates loop engineering for Business Central AL.
+
+            ### Installation
+
+            Download `mb-al-loop-demo-${{ steps.version.outputs.version }}.vsix` and install with:
+            ```bash
+            code --install-extension mb-al-loop-demo-${{ steps.version.outputs.version }}.vsix
+            ```
+
+            See [README.md](https://github.com/mbaic/mb-copilot-al-loop-demo#readme) for full documentation.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
