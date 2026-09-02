@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "./hooks/loop-limit.sh",
+        "windows": "powershell -ExecutionPolicy Bypass -File hooks\\loop-limit.ps1",
+        "timeout": 10
+      }
+    ]
+  }
+}

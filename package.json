@@ -1,0 +1,42 @@
+{
+  "name": "mb-al-loop-demo",
+  "displayName": "MB AL Loop Demo",
+  "description": "A minimal VS Code extension that demonstrates loop engineering for Business Central AL: a Copilot custom agent that fixes a build error in a self-checking loop, with a real, code-enforced attempt limit.",
+  "version": "1.0.0",
+  "publisher": "mbaic",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mbaic/mb-copilot-al-loop-demo.git"
+  },
+  "keywords": [
+    "business-central",
+    "al",
+    "copilot",
+    "agent",
+    "loop-engineering",
+    "ai"
+  ],
+  "categories": [
+    "AI"
+  ],
+  "contributes": {
+    "chatAgents": [
+      {
+        "id": "al-build-loop",
+        "name": "AL Build Loop",
+        "description": "Fixes an AL compile error using a self-checking loop",
+        "when": "config.chat.enabled"
+      }
+    ]
+  },
+  "scripts": {
+    "vsce:package": "vsce package"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.0.0"
+  }
+}
